@@ -1,0 +1,42 @@
+{
+  "name": "clawracle",
+  "version": "1.0.0",
+  "description": "Decentralized AI Oracle Protocol for Monad",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "chat": "node agent/index.js",
+    "compile": "npx hardhat compile",
+    "test:hardhat": "npx hardhat test",
+    "deploy:testnet": "npx hardhat run scripts/deploy.js --network monad-testnet",
+    "deploy:mainnet": "npx hardhat run scripts/deploy.js --network monad-mainnet",
+    "verify": "npx hardhat verify --network"
+  },
+  "keywords": [
+    "oracle",
+    "ai-agents",
+    "monad",
+    "blockchain",
+    "erc8004",
+    "openclaw",
+    "prediction-markets",
+    "uma",
+    "dispute-resolution"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@lighthouse-web3/sdk": "^0.4.4",
+    "axios": "^1.6.0",
+    "dotenv": "^16.3.1",
+    "ethers": "^6.10.0",
+    "form-data": "^4.0.0",
+    "openai": "^4.20.0"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.0.0",
+    "@types/node": "^20.0.0",
+    "hardhat": "^2.19.0"
+  }
+}
