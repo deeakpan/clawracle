@@ -374,35 +374,35 @@ const registryWithWallet = new ethers.Contract(
 // IMPORTANT: Wrap ALL event listeners in try-catch to prevent crashes
 registry.on('RequestSubmitted', async (requestId, requester, ipfsCID, category, validFrom, deadline, reward, bondRequired, event) => {
   try {
-    console.log(`\n🔔 New Request #${requestId}`);
-    console.log(`Category: ${category}`);
-    console.log(`Valid From: ${new Date(Number(validFrom) * 1000).toLocaleString()}`);
-    console.log(`Deadline: ${new Date(Number(deadline) * 1000).toLocaleString()}`);
-    console.log(`Reward: ${ethers.formatEther(reward)} CLAWCLE`);
-    
-    // Check if we can answer this
-    const canAnswer = await checkIfCanAnswer(category);
-    
-    if (canAnswer) {
-      console.log('✅ I can answer this! Will submit when validFrom time arrives...');
-      // Store request for later processing
-      storage.trackedRequests[requestId.toString()] = {
-        requestId: Number(requestId),
-        category: category,
-        validFrom: Number(validFrom),
-        deadline: Number(deadline),
-        reward: reward.toString(),
-        bondRequired: bondRequired.toString(),
-        ipfsCID: ipfsCID,
-        status: 'PENDING',
-        myAnswerId: null,
-        resolvedAt: null,
-        finalizationTime: null,
-        isDisputed: false
-      };
-      saveStorage(storage);
-    } else {
-      console.log('❌ Cannot answer - outside my expertise');
+  console.log(`\n🔔 New Request #${requestId}`);
+  console.log(`Category: ${category}`);
+  console.log(`Valid From: ${new Date(Number(validFrom) * 1000).toLocaleString()}`);
+  console.log(`Deadline: ${new Date(Number(deadline) * 1000).toLocaleString()}`);
+  console.log(`Reward: ${ethers.formatEther(reward)} CLAWCLE`);
+  
+  // Check if we can answer this
+  const canAnswer = await checkIfCanAnswer(category);
+  
+  if (canAnswer) {
+    console.log('✅ I can answer this! Will submit when validFrom time arrives...');
+    // Store request for later processing
+    storage.trackedRequests[requestId.toString()] = {
+      requestId: Number(requestId),
+      category: category,
+      validFrom: Number(validFrom),
+      deadline: Number(deadline),
+      reward: reward.toString(),
+      bondRequired: bondRequired.toString(),
+      ipfsCID: ipfsCID,
+      status: 'PENDING',
+      myAnswerId: null,
+      resolvedAt: null,
+      finalizationTime: null,
+      isDisputed: false
+    };
+    saveStorage(storage);
+  } else {
+    console.log('❌ Cannot answer - outside my expertise');
     }
   } catch (error) {
     console.error(`Error handling RequestSubmitted event:`, error.message);
@@ -414,17 +414,17 @@ registry.on('RequestSubmitted', async (requestId, requester, ipfsCID, category, 
 // IMPORTANT: Always wrap event listeners in try-catch
 registry.on('AnswerProposed', async (requestId, answerId, agent, agentId, answer, bond, event) => {
   try {
-    // Handle when answers are proposed
-    const requestData = storage.trackedRequests[requestId.toString()];
-    if (!requestData) return;
-    
-    if (agent.toLowerCase() === wallet.address.toLowerCase()) {
-      requestData.myAnswerId = Number(answerId);
-      requestData.status = 'PROPOSED';
-      requestData.resolvedAt = Math.floor(Date.now() / 1000);
-      requestData.finalizationTime = requestData.resolvedAt + 300; // 5 minutes
-      saveStorage(storage);
-      console.log(`✅ My answer #${answerId} proposed`);
+  // Handle when answers are proposed
+  const requestData = storage.trackedRequests[requestId.toString()];
+  if (!requestData) return;
+  
+  if (agent.toLowerCase() === wallet.address.toLowerCase()) {
+    requestData.myAnswerId = Number(answerId);
+    requestData.status = 'PROPOSED';
+    requestData.resolvedAt = Math.floor(Date.now() / 1000);
+    requestData.finalizationTime = requestData.resolvedAt + 300; // 5 minutes
+    saveStorage(storage);
+    console.log(`✅ My answer #${answerId} proposed`);
     }
   } catch (error) {
     console.error(`Error handling AnswerProposed event:`, error.message);
@@ -434,17 +434,17 @@ registry.on('AnswerProposed', async (requestId, answerId, agent, agentId, answer
 
 registry.on('AnswerDisputed', async (requestId, answerId, disputer, disputerAgentId, disputedAnswer, bond, originalAnswerId, event) => {
   try {
-    // Handle when answers are disputed
-    const requestData = storage.trackedRequests[requestId.toString()];
-    if (!requestData) return;
-    
-    requestData.status = 'DISPUTED';
-    requestData.isDisputed = true;
-    if (requestData.resolvedAt) {
-      requestData.finalizationTime = requestData.resolvedAt + 600; // 10 minutes
-    }
-    saveStorage(storage);
-    console.log(`🔥 Request #${requestId} disputed`);
+  // Handle when answers are disputed
+  const requestData = storage.trackedRequests[requestId.toString()];
+  if (!requestData) return;
+  
+  requestData.status = 'DISPUTED';
+  requestData.isDisputed = true;
+  if (requestData.resolvedAt) {
+    requestData.finalizationTime = requestData.resolvedAt + 600; // 10 minutes
+  }
+  saveStorage(storage);
+  console.log(`🔥 Request #${requestId} disputed`);
   } catch (error) {
     console.error(`Error handling AnswerDisputed event:`, error.message);
     // Don't crash - continue listening
@@ -453,13 +453,13 @@ registry.on('AnswerDisputed', async (requestId, answerId, disputer, disputerAgen
 
 registry.on('RequestFinalized', async (requestId, winningAnswerId, winner, reward, event) => {
   try {
-    // Handle when request is finalized
-    if (winner.toLowerCase() === wallet.address.toLowerCase()) {
-      console.log(`\n🎉 YOU WON Request #${requestId}!`);
-      console.log(`💰 Reward: ${ethers.formatEther(reward)} CLAWCLE`);
-    }
-    delete storage.trackedRequests[requestId.toString()];
-    saveStorage(storage);
+  // Handle when request is finalized
+  if (winner.toLowerCase() === wallet.address.toLowerCase()) {
+    console.log(`\n🎉 YOU WON Request #${requestId}!`);
+    console.log(`💰 Reward: ${ethers.formatEther(reward)} CLAWCLE`);
+  }
+  delete storage.trackedRequests[requestId.toString()];
+  saveStorage(storage);
   } catch (error) {
     console.error(`Error handling RequestFinalized event:`, error.message);
     // Don't crash - continue listening
@@ -943,7 +943,7 @@ async function checkAndFinalize(requestId) {
 setInterval(async () => {
   try {
     const now = Math.floor(Date.now() / 1000);
-    for (const requestId in storage.trackedRequests) {
+  for (const requestId in storage.trackedRequests) {
       const requestData = storage.trackedRequests[requestId];
       
       // Only process PENDING requests that haven't been submitted yet
@@ -959,7 +959,7 @@ setInterval(async () => {
       
       // Check if it's time to finalize
       if (requestData.finalizationTime && now >= requestData.finalizationTime) {
-        await checkAndFinalize(Number(requestId));
+    await checkAndFinalize(Number(requestId));
       }
     }
   } catch (error) {
@@ -1139,6 +1139,7 @@ Provide your LLM with:
 - The user's query
 - The API documentation (from `api.docsFile`)
 - API configuration (baseUrl, apiKey, apiKeyLocation, etc.)
+- **Default Parameters** (if `api.defaultParams` exists) - ALWAYS include these in API calls
 
 Your LLM should return a JSON object with:
 ```json
@@ -1248,6 +1249,7 @@ API Configuration:
 - API Key: {apiKey}
 - Free API Key Available: {api.freeApiKey ? `Yes (${api.freeApiKey})` : 'No'}
 - Category: {api.category}
+- Default Parameters: {api.defaultParams ? JSON.stringify(api.defaultParams) + ' (ALWAYS include these in API calls)' : 'None'}
 
 API Documentation:
 {apiDocs}
@@ -1269,7 +1271,7 @@ async function fetchDataForQuery(query, category, apiConfig, llmClient) {
   if (!api) {
     throw new Error(`No API configured for category "${category}"`);
   }
-
+  
   // 2. Read API documentation (check multiple paths)
   const docsPaths = [
     api.docsFile,
@@ -1311,9 +1313,13 @@ async function fetchDataForQuery(query, category, apiConfig, llmClient) {
     apiKeyLocation: api.apiKeyLocation,
     apiDocs: apiDocs,
     category: api.category,
-    freeApiKey: api.freeApiKey
+    freeApiKey: api.freeApiKey,
+    defaultParams: api.defaultParams || {}  // Include default parameters
   });
-
+  
+  // IMPORTANT: When constructing the API call, your LLM MUST include defaultParams
+  // Example: If defaultParams = {"units": "metric"}, the API call should include &units=metric
+  
   // 5. Execute the API call
   let apiResponse;
   if (apiCallPlan.method === 'POST') {
@@ -1336,13 +1342,13 @@ async function fetchDataForQuery(query, category, apiConfig, llmClient) {
   if (!extracted.answer || extracted.answer === 'null') {
     return null;
   }
-
-  return {
+    
+    return {
     answer: extracted.answer,
     source: extracted.source || apiCallPlan.url,
-    isPrivate: false
-  };
-}
+      isPrivate: false
+    };
+  }
 ```
 
 #### LLM Prompt for Answer Extraction
@@ -1433,6 +1439,10 @@ When the owner tells you to configure a new API, follow these steps:
      "apiKeyLocation": "header",  // or "url_path" or "query_param"
      "baseUrl": "https://api.example.com",
      "description": "Description of what this API does",
+     "defaultParams": {  // Optional: default parameters to always include in API calls
+       "units": "metric",  // Example: for OpenWeather API (returns Celsius instead of Kelvin)
+       "format": "json"    // Example: for other APIs
+     },
      "capabilities": ["Capability 1", "Capability 2"]
    });
    

@@ -69,6 +69,63 @@
       "resolvedAt": 1770740744,
       "finalizationTime": 1770741044,
       "isDisputed": false
+    },
+    "10": {
+      "requestId": 10,
+      "category": "Weather",
+      "validFrom": 1770817113,
+      "deadline": 1770903333,
+      "reward": "500000000000000000000",
+      "bondRequired": "500000000000000000000",
+      "ipfsCID": "bafkreifs52j44532rh3xroy6v7k5kotnweacgtcq46gclxxcqk4tcqpfnm",
+      "status": "PROPOSED",
+      "myAnswerId": 0,
+      "resolvedAt": 1770817145,
+      "finalizationTime": 1770817445,
+      "isDisputed": false
+    },
+    "11": {
+      "requestId": 11,
+      "category": "Weather",
+      "validFrom": 1770817738,
+      "deadline": 1770903958,
+      "reward": "500000000000000000000",
+      "bondRequired": "500000000000000000000",
+      "ipfsCID": "bafkreiexkckowvs7vgsbdqo3qk3wasbvik4bydlu7py5b5ncnd5jezkapi",
+      "status": "PROPOSED",
+      "myAnswerId": 0,
+      "resolvedAt": 1770817780,
+      "finalizationTime": 1770818080,
+      "isDisputed": false
+    },
+    "12": {
+      "requestId": 12,
+      "category": "Weather",
+      "validFrom": 1770818109,
+      "deadline": 1770904329,
+      "reward": "500000000000000000000",
+      "bondRequired": "500000000000000000000",
+      "ipfsCID": "bafkreiegfzvb6boyghtmmkwtprhdv2yn2h4g7szakj26j5on3wyz4us6yi",
+      "status": "PROPOSED",
+      "myAnswerId": 0,
+      "resolvedAt": 1770818334,
+      "finalizationTime": 1770818634,
+      "isDisputed": false
+    },
+    "13": {
+      "requestId": 13,
+      "category": "Weather",
+      "validFrom": 1770819813,
+      "deadline": 1770906033,
+      "reward": "500000000000000000000",
+      "bondRequired": "500000000000000000000",
+      "ipfsCID": "bafkreicjuolo5kwbtczp2u4hduffezmizpaxb67ejjnhhi3caia7qouycm",
+      "status": "PENDING",
+      "myAnswerId": null,
+      "resolvedAt": null,
+      "finalizationTime": null,
+      "isDisputed": false,
+      "lastFetchAttempt": 1770819814
     }
   }
 }

@@ -58,6 +58,9 @@
       "apiKeyLocation": "query_param",
       "baseUrl": "https://api.openweathermap.org/data/2.5",
       "description": "Weather data and forecasts",
+      "defaultParams": {
+        "units": "metric"
+      },
       "capabilities": [
         "Current weather",
         "Historical weather",

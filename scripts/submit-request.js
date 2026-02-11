@@ -6,16 +6,28 @@ require('dotenv').config();
 async function main() {
   console.log('📤 Submitting Data Request to Clawracle...\n');
 
-  const [requester] = await ethers.getSigners();
-  console.log('Requester:', requester.address);
+  // Use Ankr RPC for better reliability (hardcoded for this script)
+  const RPC_URL = 'https://rpc.ankr.com/monad_testnet';
+  const provider = new ethers.JsonRpcProvider(RPC_URL);
+  
+  // Get signer directly from PRIVATE_KEY in .env
+  if (!process.env.PRIVATE_KEY) {
+    console.error('❌ PRIVATE_KEY not found in .env file');
+    console.error('   Please add PRIVATE_KEY=0x... to your .env file');
+    process.exit(1);
+  }
+  
+  const requesterWithProvider = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
+  console.log('Requester:', requesterWithProvider.address);
+  console.log('Using RPC:', RPC_URL);
 
   // Contract addresses
   const registryAddress = process.env.CLAWRACLE_REGISTRY || '0x36F799abBB9C36F2a1a605f51Bd281EfbD63589E';
   const tokenAddress = process.env.CLAWRACLE_TOKEN || '0xF1e9B3B3efdeE7576119426b40C4F85A4Bd59416';
 
   // Query details
-  const query = "Did the White House approve plans for ICE at polling places on February 9, 2026?";
-  const category = "politics";
+  const query = "What is the current weather in lagos,nigeria?";
+  const category = "Weather";
   const reward = ethers.parseEther('500'); // 500 CLAWCLE reward
   const bondRequired = ethers.parseEther('500'); // 500 CLAWCLE bond
 
@@ -103,15 +115,41 @@ async function main() {
     "function approve(address spender, uint256 amount) external returns (bool)",
     "function balanceOf(address account) external view returns (uint256)"
   ];
-  const token = await ethers.getContractAt(tokenABI, tokenAddress, requester);
+  const token = new ethers.Contract(tokenAddress, tokenABI, requesterWithProvider);
 
-  // Check balance
-  const balance = await token.balanceOf(requester.address);
-  console.log(`\nRequester CLAWCLE Balance: ${ethers.formatEther(balance)} CLAWCLE`);
-
-  if (balance < reward) {
-    console.error(`❌ Insufficient balance! Need ${ethers.formatEther(reward)} CLAWCLE`);
-    return;
+  // Check balance with retry (RPC might be flaky)
+  let balance;
+  let balanceCheckFailed = false;
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      balance = await token.balanceOf(requesterWithProvider.address);
+      balanceCheckFailed = false;
+      break;
+    } catch (error) {
+      retries--;
+      if (retries === 0) {
+        console.error(`\n⚠️  Could not check balance after 3 attempts. This might be a temporary RPC issue.`);
+        console.error(`   Continuing anyway... (you can check balance manually)`);
+        console.error(`   Error: ${error.message}`);
+        balanceCheckFailed = true;
+      } else {
+        console.log(`   Retrying balance check... (${retries} attempts left)`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second
+      }
+    }
+  }
+  
+  if (!balanceCheckFailed) {
+    console.log(`\nRequester CLAWCLE Balance: ${ethers.formatEther(balance)} CLAWCLE`);
+    if (balance < reward) {
+      console.error(`❌ Insufficient balance! Need ${ethers.formatEther(reward)} CLAWCLE`);
+      console.error(`   Current balance: ${ethers.formatEther(balance)} CLAWCLE`);
+      return;
+    }
+  } else {
+    console.log(`\n⚠️  Skipping balance check due to RPC issue. Continuing anyway...`);
+    console.log(`   Make sure you have at least ${ethers.formatEther(reward)} CLAWCLE for reward + gas`);
   }
 
   // Approve reward tokens
@@ -125,7 +163,7 @@ async function main() {
     "function submitRequest(string calldata ipfsCID, string calldata category, uint256 validFrom, uint256 deadline, uint8 expectedFormat, uint256 bondRequired, uint256 reward) external returns (uint256 requestId)",
     "event RequestSubmitted(uint256 indexed requestId, address indexed requester, string ipfsCID, string category, uint256 validFrom, uint256 deadline, uint256 reward, uint256 bondRequired)"
   ];
-  const registry = await ethers.getContractAt(registryABI, registryAddress, requester);
+  const registry = new ethers.Contract(registryAddress, registryABI, requesterWithProvider);
 
   // Submit request
   console.log('\n📝 Submitting request to contract...');
@@ -144,18 +182,33 @@ async function main() {
   const receipt = await tx.wait();
 
   // Get request ID from event
-  const event = receipt.logs.find(log => {
-    try {
-      const parsed = registry.interface.parseLog(log);
-      return parsed.name === 'RequestSubmitted';
-    } catch {
-      return false;
+  let requestId = null;
+  try {
+    // Try to parse events from receipt
+    const eventFilter = registry.filters.RequestSubmitted();
+    const events = await registry.queryFilter(eventFilter, receipt.blockNumber, receipt.blockNumber);
+    
+    if (events.length > 0) {
+      requestId = events[0].args.requestId;
+    } else {
+      // Fallback: try parsing logs directly
+      for (const log of receipt.logs) {
+        try {
+          const parsed = registry.interface.parseLog(log);
+          if (parsed && parsed.name === 'RequestSubmitted') {
+            requestId = parsed.args.requestId;
+            break;
+          }
+        } catch (e) {
+          // Not our event, continue
+        }
+      }
     }
-  });
+  } catch (error) {
+    console.log(`   Warning: Could not parse event: ${error.message}`);
+  }
 
-  if (event) {
-    const parsed = registry.interface.parseLog(event);
-    const requestId = parsed.args.requestId;
+  if (requestId !== null) {
     console.log('\n✅ Request submitted successfully!');
     console.log(`   Request ID: ${requestId}`);
     console.log(`   IPFS CID: ${ipfsCID}`);
@@ -163,6 +216,9 @@ async function main() {
     console.log(`\n🔗 View on IPFS: https://ipfs.io/ipfs/${ipfsCID}`);
   } else {
     console.log('\n✅ Request submitted (could not parse event)');
+    console.log(`   Transaction hash: ${receipt.hash}`);
+    console.log(`   Block: ${receipt.blockNumber}`);
+    console.log(`   You can check the transaction to find the request ID`);
   }
 }
 

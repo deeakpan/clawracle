@@ -381,6 +381,7 @@ API Configuration:
 - API Key: ${apiKey || 'Not required'}
 - Free API Key Available: ${api.freeApiKey ? `Yes (${api.freeApiKey})` : 'No'}
 - Category: ${api.category}
+${api.defaultParams ? `- Default Parameters: ${JSON.stringify(api.defaultParams)} (ALWAYS include these in API calls)` : ''}
 
 API Documentation:
 ${apiDocs}
