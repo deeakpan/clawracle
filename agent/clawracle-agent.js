@@ -721,11 +721,12 @@ registry.on('AnswerDisputed', async (requestId, answerId, disputer, disputerAgen
 
     requestData.status = 'DISPUTED';
     requestData.isDisputed = true;
+    // Update finalization time: dispute period (5 min) + validation period (5 min) = 10 min total
     if (requestData.resolvedAt) {
-      requestData.finalizationTime = requestData.resolvedAt + 600; // 10 minutes
+      requestData.finalizationTime = requestData.resolvedAt + 300 + 300; // 10 minutes total
     }
     saveStorage(storage);
-    console.log(`🔥 Request #${requestId} disputed`);
+    console.log(`⚠️  Request #${requestId} disputed by ${disputer}`);
   } catch (error) {
     console.error(`Error handling AnswerDisputed event:`, error.message);
     // Don't crash - continue listening
@@ -746,12 +747,82 @@ registry.on('RequestFinalized', async (requestId, winningAnswerId, winner, rewar
   }
 });
 
-// Periodic check for pending requests
+// Periodic check for pending requests and finalization
 setInterval(async () => {
   try {
     const now = Math.floor(Date.now() / 1000);
     for (const requestId in storage.trackedRequests) {
       const requestData = storage.trackedRequests[requestId];
+      
+      // Check if request needs finalization
+      if (requestData.status === 'PROPOSED' || requestData.status === 'DISPUTED') {
+        if (requestData.resolvedAt && requestData.finalizationTime) {
+          const DISPUTE_PERIOD = 300; // 5 minutes
+          const VALIDATION_PERIOD = 300; // 5 minutes
+          
+          // Calculate when finalization is allowed
+          let finalizationAllowedAt = requestData.resolvedAt + DISPUTE_PERIOD;
+          if (requestData.status === 'DISPUTED') {
+            finalizationAllowedAt += VALIDATION_PERIOD; // Add validation period for disputed requests
+          }
+          
+          if (now >= finalizationAllowedAt && !processingLocks.has(requestId + '_finalize')) {
+            console.log(`\n🔔 Attempting finalization for Request #${requestId}...`);
+            // Check on-chain status first before attempting to finalize
+            processingLocks.add(requestId + '_finalize');
+            try {
+              console.log(`   Checking on-chain status...`);
+              const query = await registryWithWallet.getQuery(Number(requestId));
+              const onChainStatus = Number(query.status); // Convert BigInt to Number: 0=Pending, 1=Proposed, 2=Disputed, 3=Finalized
+              console.log(`   On-chain status: ${onChainStatus} (0=Pending, 1=Proposed, 2=Disputed, 3=Finalized)`);
+              
+              if (onChainStatus === 3) {
+                // Already finalized on-chain
+                console.log(`✅ Request #${requestId} already finalized on-chain`);
+                requestData.status = 'FINALIZED';
+                saveStorage(storage);
+                processingLocks.delete(requestId + '_finalize');
+                continue;
+              }
+              
+              if (onChainStatus !== 1 && onChainStatus !== 2) {
+                // Not in Proposed or Disputed state, skip
+                console.log(`   ⏭️  Skipping - status is ${onChainStatus}, not Proposed (1) or Disputed (2)`);
+                processingLocks.delete(requestId + '_finalize');
+                continue;
+              }
+              
+              console.log(`\n⏰ Finalization time reached for Request #${requestId}`);
+              console.log(`   Attempting to finalize...`);
+              
+              const finalizeTx = await registryWithWallet.finalizeRequest(Number(requestId));
+              console.log(`   Transaction hash: ${finalizeTx.hash}`);
+              await finalizeTx.wait();
+              
+              console.log(`✅ Request #${requestId} finalized`);
+              requestData.status = 'FINALIZED';
+              saveStorage(storage);
+            } catch (error) {
+              if (error.message.includes('Already finalized') || 
+                  error.message.includes('already finalized')) {
+                // Already finalized, update local status
+                console.log(`✅ Request #${requestId} already finalized`);
+                requestData.status = 'FINALIZED';
+                saveStorage(storage);
+              } else if (error.message.includes('Dispute period not ended') || 
+                  error.message.includes('Validation period not ended')) {
+                // Not ready yet, will retry
+                console.log(`   ⏳ Not ready yet: ${error.message}`);
+              } else {
+                console.error(`   ❌ Error finalizing: ${error.message}`);
+              }
+            } finally {
+              processingLocks.delete(requestId + '_finalize');
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+          }
+        }
+      }
       
       // Only process PENDING requests that haven't been submitted yet
       if (requestData.status === 'PENDING' &&
