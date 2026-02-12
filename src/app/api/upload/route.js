@@ -7,7 +7,20 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(request) {
   try {
-    const body = await request.json()
+    // Log for debugging
+    console.log('POST /api/upload called')
+    
+    let body
+    try {
+      body = await request.json()
+    } catch (jsonError) {
+      console.error('JSON parse error:', jsonError)
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body', details: jsonError.message },
+        { status: 400 }
+      )
+    }
+    
     const { text } = body
     
     if (!text) {
