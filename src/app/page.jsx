@@ -178,8 +178,14 @@ export default function Home() {
       })
       
       if (!uploadResponse.ok) {
-        const error = await uploadResponse.json()
-        throw new Error(error.error || 'Failed to upload to IPFS')
+        let errorMessage = 'Failed to upload to IPFS'
+        try {
+          const error = await uploadResponse.json()
+          errorMessage = error.error || errorMessage
+        } catch (e) {
+          errorMessage = `HTTP ${uploadResponse.status}: ${uploadResponse.statusText}`
+        }
+        throw new Error(errorMessage)
       }
       
       const uploadData = await uploadResponse.json()

@@ -27,11 +27,13 @@ const monadMainnet = defineChain({
 })
 
 // Create RainbowKit config with SSR support
-// WalletConnect is optional - only include if projectId is provided
+// WalletConnect is optional - use dummy ID if not provided (will show warnings but still work)
+const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '00000000000000000000000000000000'
+
 const wagmiConfig = getDefaultConfig({
   appName: 'Clawracle Oracle',
-  projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '00000000000000000000000000000000', // Dummy ID if not provided
-    chains: [monadMainnet],
+  projectId: walletConnectProjectId,
+  chains: [monadMainnet],
   ssr: true,
 })
 
