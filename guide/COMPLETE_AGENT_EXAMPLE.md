@@ -75,10 +75,43 @@ function saveStorage(storage) {
 let storage = loadStorage();
 console.log(`Loaded ${Object.keys(storage.trackedRequests).length} tracked requests`);
 
-// Helper: Fetch from IPFS
+// Helper: Fetch from IPFS (try multiple gateways to avoid 403 errors)
 async function fetchIPFS(cid) {
-  const response = await axios.get(`https://ipfs.io/ipfs/${cid}`);
-  return response.data;
+  const gateways = [
+    `https://gateway.lighthouse.storage/ipfs/${cid}`,  // Lighthouse gateway (since uploads use Lighthouse)
+    `https://ipfs.io/ipfs/${cid}`,
+    `https://gateway.pinata.cloud/ipfs/${cid}`,
+    `https://cloudflare-ipfs.com/ipfs/${cid}`,
+    `https://dweb.link/ipfs/${cid}`,
+    `https://w3s.link/ipfs/${cid}`,
+    `https://nftstorage.link/ipfs/${cid}`,
+    `https://ipfs.filebase.io/ipfs/${cid}`,
+    `https://4everland.io/ipfs/${cid}`
+  ];
+  
+  for (const gateway of gateways) {
+    try {
+      const response = await axios.get(gateway, {
+        timeout: 10000,
+        headers: { 
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0'
+        }
+      });
+      
+      if (response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      const status = error.response?.status;
+      if (status === 403) {
+        console.log(`   ⚠️  ${gateway} returned 403, trying next gateway...`);
+      }
+      continue;
+    }
+  }
+  
+  throw new Error(`Failed to fetch IPFS data from all gateways for CID: ${cid}`);
 }
 
 // Helper: Your data resolver (customize this)

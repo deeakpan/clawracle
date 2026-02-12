@@ -129,11 +129,15 @@ async function fetchIPFS(cidOrUrl) {
   }
 
   const gateways = [
-    `https://ipfs.io/ipfs/${cid}`,  // Primary - most efficient
+    `https://gateway.lighthouse.storage/ipfs/${cid}`,  // Lighthouse gateway (since uploads use Lighthouse)
+    `https://ipfs.io/ipfs/${cid}`,
     `https://gateway.pinata.cloud/ipfs/${cid}`,
     `https://cloudflare-ipfs.com/ipfs/${cid}`,
     `https://dweb.link/ipfs/${cid}`,
-    `https://ipfs.filebase.io/ipfs/${cid}`
+    `https://w3s.link/ipfs/${cid}`,
+    `https://nftstorage.link/ipfs/${cid}`,
+    `https://ipfs.filebase.io/ipfs/${cid}`,
+    `https://4everland.io/ipfs/${cid}`
   ];
 
   for (let i = 0; i < gateways.length; i++) {

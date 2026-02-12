@@ -87,8 +87,9 @@ When a request is received and `validFrom` time arrives, the agent resolves it:
 
 **Code Flow:**
 ```javascript
-// 1. Fetch from IPFS
+// 1. Fetch from IPFS (try multiple gateways, start with Lighthouse since uploads use Lighthouse)
 const queryData = await fetchIPFS(ipfsCID);
+// fetchIPFS should try: gateway.lighthouse.storage first, then ipfs.io, pinata, cloudflare, etc.
 
 // 2. YOU determine and execute API call (read api-config.json + API docs yourself, then make the HTTP request)
 // Read api-config.json to find which API handles this category
@@ -106,7 +107,9 @@ const encodedAnswer = ethers.toUtf8Bytes(result.answer);
 await registry.resolveRequest(requestId, agentId, encodedAnswer, result.source, false);
 ```
 
-**See `{baseDir}/guide/scripts/resolve-query.js` for complete implementation.**
+**See `{baseDir}/guide/scripts/resolve-query.js` for complete implementation.
+
+**IMPORTANT - IPFS Gateway Selection**: Since uploads use Lighthouse IPFS, always try `https://gateway.lighthouse.storage/ipfs/${cid}` FIRST, then fall back to other gateways (ipfs.io, pinata, cloudflare, etc.) if that fails. Some gateways may return 403 errors, so try multiple gateways.**
 
 ### Agent State Storage (`agent-storage.json`)
 

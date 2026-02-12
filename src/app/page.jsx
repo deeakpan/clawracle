@@ -11,7 +11,18 @@ import Image from 'next/image'
 function formatBalance(value, decimals = 2) {
   if (!value) return '0'
   try {
-    const num = typeof value === 'bigint' ? Number(formatEther(value)) : Number(value)
+    let num
+    // Handle BigInt, string BigInt, or regular number
+    if (typeof value === 'bigint') {
+      num = Number(formatEther(value))
+    } else if (typeof value === 'string') {
+      // Check if it's a string representation of a BigInt (very large number)
+      const bigIntValue = BigInt(value)
+      num = Number(formatEther(bigIntValue))
+    } else {
+      num = Number(value)
+    }
+    
     if (isNaN(num) || !isFinite(num)) return '0'
     // Round to specified decimals and remove trailing zeros
     const formatted = num.toFixed(decimals)

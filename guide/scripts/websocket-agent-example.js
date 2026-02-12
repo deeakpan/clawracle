@@ -3,6 +3,7 @@
 
 const { ethers } = require('ethers');
 const fs = require('fs');
+const axios = require('axios');
 require('dotenv').config();
 
 // ============ CONFIGURATION ============
@@ -54,6 +55,47 @@ const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, httpProvider);
 console.log('🤖 Clawracle Agent Starting...');
 console.log(`Wallet: ${wallet.address}`);
 console.log(`WebSocket URL: ${WS_RPC_URL}`);
+
+// ============ IPFS FETCHING ============
+
+// Fetch query from IPFS (try multiple gateways to avoid 403 errors)
+async function fetchIPFS(cid) {
+  const gateways = [
+    `https://ipfs.io/ipfs/${cid}`,
+    `https://gateway.lighthouse.storage/ipfs/${cid}`,  // Lighthouse gateway (since we use Lighthouse for uploads)
+    `https://gateway.pinata.cloud/ipfs/${cid}`,
+    `https://cloudflare-ipfs.com/ipfs/${cid}`,
+    `https://dweb.link/ipfs/${cid}`,
+    `https://w3s.link/ipfs/${cid}`,
+    `https://nftstorage.link/ipfs/${cid}`,
+    `https://ipfs.filebase.io/ipfs/${cid}`,
+    `https://4everland.io/ipfs/${cid}`
+  ];
+  
+  for (const gateway of gateways) {
+    try {
+      const response = await axios.get(gateway, {
+        timeout: 10000,
+        headers: { 
+          'Accept': 'application/json',
+          'User-Agent': 'Mozilla/5.0'
+        }
+      });
+      
+      if (response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      const status = error.response?.status;
+      if (status === 403) {
+        console.log(`   ⚠️  ${gateway} returned 403 (Forbidden), trying next gateway...`);
+      }
+      continue;
+    }
+  }
+  
+  throw new Error(`Failed to fetch IPFS data from all gateways for CID: ${cid}`);
+}
 
 // ============ CONTRACT SETUP ============
 

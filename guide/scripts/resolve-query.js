@@ -51,10 +51,41 @@ async function resolveQuery(requestId) {
   console.log(`Query Category: ${query.category}`);
   console.log(`IPFS CID: ${query.ipfsCID}`);
   
-  // 2. Fetch query details from IPFS
+  // 2. Fetch query details from IPFS (try multiple gateways)
   console.log('📥 Fetching query from IPFS...');
-  const ipfsResponse = await axios.get(`https://ipfs.io/ipfs/${query.ipfsCID}`);
-  const queryData = ipfsResponse.data;
+  
+  // Try multiple IPFS gateways (some may return 403)
+  const gateways = [
+    `https://ipfs.io/ipfs/${query.ipfsCID}`,
+    `https://gateway.lighthouse.storage/ipfs/${query.ipfsCID}`,  // Lighthouse gateway (since we use Lighthouse for uploads)
+    `https://gateway.pinata.cloud/ipfs/${query.ipfsCID}`,
+    `https://cloudflare-ipfs.com/ipfs/${query.ipfsCID}`,
+    `https://dweb.link/ipfs/${query.ipfsCID}`,
+    `https://w3s.link/ipfs/${query.ipfsCID}`,
+    `https://nftstorage.link/ipfs/${query.ipfsCID}`
+  ];
+  
+  let queryData = null;
+  for (const gateway of gateways) {
+    try {
+      const ipfsResponse = await axios.get(gateway, {
+        timeout: 10000,
+        headers: { 'Accept': 'application/json' }
+      });
+      queryData = ipfsResponse.data;
+      console.log(`✅ Fetched from ${gateway}`);
+      break;
+    } catch (error) {
+      if (error.response?.status === 403) {
+        console.log(`   ⚠️  ${gateway} returned 403, trying next gateway...`);
+      }
+      continue;
+    }
+  }
+  
+  if (!queryData) {
+    throw new Error(`Failed to fetch IPFS data from all gateways for CID: ${query.ipfsCID}`);
+  }
   console.log(`Query: "${queryData.query}"`);
   
   // 3. Use LLM to determine API call (this is where AI determines which API to use)
