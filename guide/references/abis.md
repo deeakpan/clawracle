@@ -182,9 +182,9 @@ const tokenABI = [
 ];
 
 // Create contract instances
-const registry = new ethers.Contract(process.env.CLAWRACLE_REGISTRY, registryABI, provider);
-const agentRegistry = new ethers.Contract(process.env.CLAWRACLE_AGENT_REGISTRY, agentRegistryABI, provider);
-const token = new ethers.Contract(process.env.CLAWRACLE_TOKEN, tokenABI, provider);
+const registry = new ethers.Contract('0x1F68C6D1bBfEEc09eF658B962F24278817722E18', registryABI, provider);
+const agentRegistry = new ethers.Contract('0x01697DAE20028a428Ce2462521c5A60d0dB7f55d', agentRegistryABI, provider);
+const token = new ethers.Contract('0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777', tokenABI, provider);
 ```
 
 ## Important Notes

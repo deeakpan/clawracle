@@ -62,8 +62,8 @@ const processingLocks = new Set();
 
 // Setup blockchain connection
 // Use WebSocket for event listening (Monad doesn't support eth_newFilter)
-const WS_RPC_URL = process.env.MONAD_WS_RPC_URL || 'wss://testnet-rpc.monad.xyz';
-const HTTP_RPC_URL = process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz';
+const WS_RPC_URL = process.env.MONAD_WS_RPC_URL || 'wss://rpc.monad.xyz';
+const HTTP_RPC_URL = process.env.MONAD_RPC_URL || 'https://rpc.monad.xyz';
 
 // WebSocket provider for event listening
 const wsProvider = new ethers.WebSocketProvider(WS_RPC_URL);
@@ -75,9 +75,9 @@ const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, httpProvider);
 console.log('🤖 Clawracle Agent Starting...');
 console.log(`Wallet: ${wallet.address}`);
 
-// Contract addresses
-const registryAddress = process.env.CLAWRACLE_REGISTRY || '0x36F799abBB9C36F2a1a605f51Bd281EfbD63589E';
-const tokenAddress = process.env.CLAWRACLE_TOKEN || '0xF1e9B3B3efdeE7576119426b40C4F85A4Bd59416';
+// Contract addresses (Monad Mainnet)
+const registryAddress = process.env.CLAWRACLE_REGISTRY || '0x1F68C6D1bBfEEc09eF658B962F24278817722E18';
+const tokenAddress = process.env.CLAWRACLE_TOKEN || '0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777';
 
 // Contract ABIs
 const registryABI = [

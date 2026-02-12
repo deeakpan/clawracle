@@ -14,13 +14,8 @@ async function main() {
     process.exit(1);
   }
 
-  if (!process.env.CLAWRACLE_REGISTRY) {
-    console.error('❌ CLAWRACLE_REGISTRY not found in .env');
-    console.error('Please set CLAWRACLE_REGISTRY in your .env file');
-    return;
-  }
-  const registryAddress = process.env.CLAWRACLE_REGISTRY;
-  const rpcUrl = process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz';
+  const registryAddress = '0x1F68C6D1bBfEEc09eF658B962F24278817722E18';
+  const rpcUrl = 'https://rpc.monad.xyz';
 
   const registryABI = [
     "function getQuery(uint256 requestId) external view returns (tuple(uint256 requestId, string ipfsCID, uint256 validFrom, uint256 deadline, address requester, string category, uint8 expectedFormat, uint256 bondRequired, uint256 reward, uint8 status, uint256 createdAt, uint256 resolvedAt))",

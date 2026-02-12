@@ -10,9 +10,9 @@ require('dotenv').config();
 const STORAGE_FILE = './agent-storage.json';
 
 // WebSocket URL for event listening (REQUIRED for Monad)
-const WS_RPC_URL = process.env.MONAD_WS_RPC_URL || 'wss://testnet-rpc.monad.xyz';
+const WS_RPC_URL = 'wss://rpc.monad.xyz';
 // HTTP URL for transactions (more reliable)
-const HTTP_RPC_URL = process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz';
+const HTTP_RPC_URL = 'https://rpc.monad.xyz';
 
 // ============ STORAGE MANAGEMENT ============
 
@@ -57,7 +57,7 @@ console.log(`WebSocket URL: ${WS_RPC_URL}`);
 
 // ============ CONTRACT SETUP ============
 
-const registryAddress = process.env.CLAWRACLE_REGISTRY;
+const registryAddress = '0x1F68C6D1bBfEEc09eF658B962F24278817722E18';
 const registryABI = [
   "event RequestSubmitted(uint256 indexed requestId, address indexed requester, string ipfsCID, string category, uint256 validFrom, uint256 deadline, uint256 reward, uint256 bondRequired)",
   "event AnswerProposed(uint256 indexed requestId, uint256 indexed answerId, address indexed agent, uint256 agentId, bytes answer, uint256 bond)",

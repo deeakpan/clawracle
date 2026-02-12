@@ -22,7 +22,7 @@ async function main() {
   console.log('📤 Submitting Data Request to Clawracle...\n');
 
   // RPC URL
-  const RPC_URL = process.env.MONAD_RPC_URL || 'https://rpc.ankr.com/monad_testnet';
+  const RPC_URL = 'https://rpc.monad.xyz';
   const provider = new ethers.JsonRpcProvider(RPC_URL);
   
   // Get signer from PRIVATE_KEY in .env (this is the requester wallet, not agent wallet)
@@ -36,14 +36,9 @@ async function main() {
   console.log('Requester:', requesterWallet.address);
   console.log('Using RPC:', RPC_URL);
 
-  // Contract addresses (must be set in .env)
-  if (!process.env.CLAWRACLE_REGISTRY || !process.env.CLAWRACLE_TOKEN) {
-    console.error('❌ Contract addresses not found in .env');
-    console.error('   Please set CLAWRACLE_REGISTRY and CLAWRACLE_TOKEN');
-    return;
-  }
-  const registryAddress = process.env.CLAWRACLE_REGISTRY;
-  const tokenAddress = process.env.CLAWRACLE_TOKEN;
+  // Contract addresses (Monad Mainnet)
+  const registryAddress = '0x1F68C6D1bBfEEc09eF658B962F24278817722E18';
+  const tokenAddress = '0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777';
 
   // Query details - EDIT THESE
   const query = "What is the current weather in New York?";

@@ -14,18 +14,13 @@ async function main() {
     return;
   }
 
-  const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz');
+  const provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
   const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, provider);
   
   console.log('Agent Wallet:', wallet.address);
   
-  // Contract addresses (must be set in .env)
-  if (!process.env.CLAWRACLE_AGENT_REGISTRY) {
-    console.error('❌ CLAWRACLE_AGENT_REGISTRY not found in .env');
-    console.error('Please set CLAWRACLE_AGENT_REGISTRY in your .env file');
-    return;
-  }
-  const agentRegistryAddress = process.env.CLAWRACLE_AGENT_REGISTRY;
+  // Contract addresses (Monad Mainnet)
+  const agentRegistryAddress = '0x01697DAE20028a428Ce2462521c5A60d0dB7f55d';
   
   // Agent info (must be set in .env)
   if (!process.env.YOUR_ERC8004_AGENT_ID) {

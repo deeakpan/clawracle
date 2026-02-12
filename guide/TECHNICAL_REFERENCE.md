@@ -90,7 +90,7 @@ const registryABI = [
 ];
 
 const registry = new ethers.Contract(
-  process.env.CLAWRACLE_REGISTRY,
+  '0x1F68C6D1bBfEEc09eF658B962F24278817722E18',
   registryABI,
   provider
 );
@@ -379,7 +379,7 @@ const registryABI = [
 ];
 
 const registry = new ethers.Contract(
-  process.env.CLAWRACLE_REGISTRY,
+  '0x1F68C6D1bBfEEc09eF658B962F24278817722E18',
   registryABI,
   wallet
 );
@@ -665,10 +665,10 @@ const MarketResolver = require('./resolvers/market');
 
 class ClawracleAgent {
   constructor() {
-    this.provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+    this.provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
     this.wallet = new ethers.Wallet(process.env.PRIVATE_KEY, this.provider);
     this.registry = new ethers.Contract(
-      process.env.CLAWRACLE_REGISTRY,
+      '0x1F68C6D1bBfEEc09eF658B962F24278817722E18',
       registryABI,
       this.wallet
     );
@@ -708,7 +708,7 @@ class ClawracleAgent {
   async submitAnswer(requestId, result) {
     // Approve bond
     const token = new ethers.Contract(
-      process.env.CLAWRACLE_TOKEN,
+      '0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777',
       tokenABI,
       this.wallet
     );

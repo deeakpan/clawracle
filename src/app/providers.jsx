@@ -7,10 +7,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { defineChain } from 'viem'
 import '@rainbow-me/rainbowkit/styles.css'
 
-// Define Monad testnet chain
-const monadTestnet = defineChain({
-  id: 10143,
-  name: 'Monad Testnet',
+// Define Monad mainnet chain
+const monadMainnet = defineChain({
+  id: 143,
+  name: 'Monad Mainnet',
   nativeCurrency: {
     decimals: 18,
     name: 'MON',
@@ -18,11 +18,11 @@ const monadTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://testnet-rpc.monad.xyz'],
+      http: ['https://rpc.monad.xyz'],
     },
   },
   blockExplorers: {
-    default: { name: 'Explorer', url: 'https://testnet-explorer.monad.xyz' },
+    default: { name: 'Explorer', url: 'https://monadvision.com' },
   },
 })
 
@@ -31,7 +31,7 @@ const monadTestnet = defineChain({
 const wagmiConfig = getDefaultConfig({
   appName: 'Clawracle Oracle',
   projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || '00000000000000000000000000000000', // Dummy ID if not provided
-  chains: [monadTestnet],
+    chains: [monadMainnet],
   ssr: true,
 })
 

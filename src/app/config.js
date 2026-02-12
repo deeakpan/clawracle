@@ -1,10 +1,10 @@
 import { getDefaultConfig } from 'connectkit'
 import { defineChain } from 'viem'
 
-// Define Monad testnet chain
-const monadTestnet = defineChain({
-  id: 10143,
-  name: 'Monad Testnet',
+// Define Monad mainnet chain
+const monadMainnet = defineChain({
+  id: 143,
+  name: 'Monad Mainnet',
   nativeCurrency: {
     decimals: 18,
     name: 'MON',
@@ -12,11 +12,11 @@ const monadTestnet = defineChain({
   },
   rpcUrls: {
     default: {
-      http: ['https://testnet-rpc.monad.xyz'],
+      http: ['https://rpc.monad.xyz'],
     },
   },
   blockExplorers: {
-    default: { name: 'Explorer', url: 'https://testnet-explorer.monad.xyz' },
+    default: { name: 'Explorer', url: 'https://monadvision.com' },
   },
 })
 
@@ -29,7 +29,7 @@ const defaultConfig = getDefaultConfig({
   appDescription: 'Decentralized AI Oracle Protocol',
   appUrl: 'https://clawracle.xyz',
   appIcon: 'https://clawracle.xyz/logo.png',
-  chains: [monadTestnet],
+  chains: [monadMainnet],
   walletConnectProjectId: walletConnectProjectId,
 })
 

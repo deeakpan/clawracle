@@ -22,9 +22,9 @@ export default function Home() {
   const [reward, setReward] = useState('500')
   const [bondRequired, setBondRequired] = useState('500')
   
-  // Contract addresses
-  const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_CLAWRACLE_REGISTRY || '0x36F799abBB9C36F2a1a605f51Bd281EfbD63589E'
-  const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_CLAWRACLE_TOKEN || '0xF1e9B3B3efdeE7576119426b40C4F85A4Bd59416'
+  // Contract addresses (Monad Mainnet)
+  const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_CLAWRACLE_REGISTRY || '0x1F68C6D1bBfEEc09eF658B962F24278817722E18'
+  const TOKEN_ADDRESS = process.env.NEXT_PUBLIC_CLAWRACLE_TOKEN || '0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777'
 
   // Token ABI
   const tokenABI = [

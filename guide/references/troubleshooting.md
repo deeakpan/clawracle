@@ -11,22 +11,22 @@
 **Solution**:
 ```javascript
 // ❌ WRONG - HTTP RPC for events
-const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+const provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
 const registry = new ethers.Contract(address, abi, provider);
 
 // ✅ CORRECT - WebSocket for events, HTTP for transactions
-const wsProvider = new ethers.WebSocketProvider(process.env.MONAD_WS_RPC_URL);
-const httpProvider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+const wsProvider = new ethers.WebSocketProvider('wss://rpc.monad.xyz');
+const httpProvider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
 const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, httpProvider);
 
 const registry = new ethers.Contract(address, abi, wsProvider); // WebSocket for events
 const registryWithWallet = new ethers.Contract(address, abi, wallet); // HTTP for transactions
 ```
 
-**Required Environment Variables**:
+**Monad Mainnet Configuration**:
 ```bash
-MONAD_WS_RPC_URL=wss://testnet-rpc.monad.xyz  # REQUIRED
-MONAD_RPC_URL=https://testnet-rpc.monad.xyz  # For transactions
+MONAD_WS_RPC_URL=wss://rpc.monad.xyz  # REQUIRED
+MONAD_RPC_URL=https://rpc.monad.xyz  # For transactions
 ```
 
 ### 2. BigInt Conversion Issues

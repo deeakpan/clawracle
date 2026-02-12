@@ -60,9 +60,9 @@ const REGISTRY_ABI = [
   },
 ]
 
-// Use Ankr RPC for better reliability (or fallback to Monad RPC)
-const RPC_URL = process.env.MONAD_RPC_URL || 'https://rpc.ankr.com/monad_testnet'
-const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_CLAWRACLE_REGISTRY || '0x36F799abBB9C36F2a1a605f51Bd281EfbD63589E'
+// Monad Mainnet RPC
+const RPC_URL = process.env.MONAD_RPC_URL || 'https://rpc.monad.xyz'
+const REGISTRY_ADDRESS = process.env.NEXT_PUBLIC_CLAWRACLE_REGISTRY || '0x1F68C6D1bBfEEc09eF658B962F24278817722E18'
 
 export async function GET(request) {
   try {

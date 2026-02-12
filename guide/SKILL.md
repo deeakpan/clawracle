@@ -160,8 +160,17 @@ Example: `node guide/scripts/view-answers.js 3`
 
 **Required Environment Variables:**
 - See `{baseDir}/references/setup.md` for complete `.env` setup
-- **Contract Addresses Required**: `CLAWRACLE_REGISTRY`, `CLAWRACLE_TOKEN`, `CLAWRACLE_AGENT_REGISTRY` (get from contract deployment or owner)
+- **Monad Mainnet Network Details**:
+  - `MONAD_RPC_URL`: `https://rpc.monad.xyz`
+  - `MONAD_WS_RPC_URL`: `wss://rpc.monad.xyz`
+  - `MONAD_CHAIN_ID`: `143`
+- **Contract Addresses (Mainnet)**:
+  - `CLAWRACLE_REGISTRY`: `0x1F68C6D1bBfEEc09eF658B962F24278817722E18`
+  - `CLAWRACLE_TOKEN`: `0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777`
+  - `CLAWRACLE_AGENT_REGISTRY`: `0x01697DAE20028a428Ce2462521c5A60d0dB7f55d`
 - **WebSocket RPC is REQUIRED** - Monad doesn't support `eth_newFilter` on HTTP RPC
+
+**IMPORTANT**: These addresses are hardcoded in all guide scripts and examples. Use these values directly in your code - no need for `.env` variables for these addresses.
 
 **API Configuration:**
 - Edit `{baseDir}/api-config.json` to add new data sources

@@ -27,11 +27,11 @@ require('dotenv').config();
 async function resolveQuery(requestId) {
   // This is what happens inside the agent when it resolves a query
   
-  const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+  const provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
   const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, provider);
   
-  const registryAddress = process.env.CLAWRACLE_REGISTRY;
-  const tokenAddress = process.env.CLAWRACLE_TOKEN;
+  const registryAddress = '0x1F68C6D1bBfEEc09eF658B962F24278817722E18';
+  const tokenAddress = '0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777';
   
   const registryABI = [
     "function resolveRequest(uint256 requestId, uint256 agentId, bytes calldata answer, string calldata source, bool isPrivateSource) external",

@@ -25,7 +25,7 @@ const fs = require('fs');
 require('dotenv').config();
 
 // Setup
-const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+const provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
 const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 const registryABI = [
@@ -45,8 +45,8 @@ const tokenABI = [
   "function balanceOf(address account) external view returns (uint256)"
 ];
 
-const registry = new ethers.Contract(process.env.CLAWRACLE_REGISTRY, registryABI, wallet);
-const token = new ethers.Contract(process.env.CLAWRACLE_TOKEN, tokenABI, wallet);
+const registry = new ethers.Contract('0x1F68C6D1bBfEEc09eF658B962F24278817722E18', registryABI, wallet);
+const token = new ethers.Contract('0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777', tokenABI, wallet);
 
 // ============================================
 // JSON Storage Setup

@@ -63,7 +63,7 @@ Network: Monad Testnet (Chain ID: 10143)
 const { ethers } = require('ethers');
 require('dotenv').config();
 
-const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+const provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
 const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, provider);
 
 // Check MON balance (native token)
@@ -72,7 +72,7 @@ console.log(`MON Balance: ${ethers.formatEther(monBalance)} MON`);
 
 // Check CLAWCLE balance (token)
 const tokenABI = ["function balanceOf(address) view returns (uint256)"];
-const token = new ethers.Contract(process.env.CLAWRACLE_TOKEN, tokenABI, provider);
+const token = new ethers.Contract('0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777', tokenABI, provider);
 const clawBalance = await token.balanceOf(wallet.address);
 console.log(`CLAWCLE Balance: ${ethers.formatEther(clawBalance)} CLAWCLE`);
 
@@ -90,18 +90,18 @@ if (clawBalance < ethers.parseEther('3000')) {
 Create a `.env` file in your agent's directory:
 
 ```bash
-# Monad Configuration
-MONAD_RPC_URL=https://testnet-rpc.monad.xyz
-MONAD_WS_RPC_URL=wss://testnet-rpc.monad.xyz  # REQUIRED for event listening
-MONAD_CHAIN_ID=10143
+# Monad Mainnet Configuration
+MONAD_RPC_URL=https://rpc.monad.xyz
+MONAD_WS_RPC_URL=wss://rpc.monad.xyz  # REQUIRED for event listening
+MONAD_CHAIN_ID=143
 
 # Agent Wallet (Generated Fresh - Never Share Private Key!)
 CLAWRACLE_AGENT_KEY=0x...  # Your generated private key - KEEP SECRET!
 
-# Clawracle Contract Addresses (Get from contract deployment or owner)
-CLAWRACLE_REGISTRY=0x... # DataRequestRegistry address
-CLAWRACLE_TOKEN=0x...    # ClawracleToken address
-CLAWRACLE_AGENT_REGISTRY=0x... # AgentRegistry address
+# Clawracle Contract Addresses (Mainnet)
+CLAWRACLE_REGISTRY=0x1F68C6D1bBfEEc09eF658B962F24278817722E18
+CLAWRACLE_TOKEN=0x99FB9610eC9Ff445F990750A7791dB2c1F5d7777
+CLAWRACLE_AGENT_REGISTRY=0x01697DAE20028a428Ce2462521c5A60d0dB7f55d
 
 # Your Agent Info
 YOUR_ERC8004_AGENT_ID=12345  # Your ERC-8004 agent ID
@@ -195,9 +195,9 @@ const { ethers } = require('ethers');
 require('dotenv').config();
 
 // WebSocket URL for event listening (REQUIRED for Monad)
-const WS_RPC_URL = process.env.MONAD_WS_RPC_URL || 'wss://testnet-rpc.monad.xyz';
+const WS_RPC_URL = 'wss://rpc.monad.xyz';
 // HTTP URL for transactions (more reliable)
-const HTTP_RPC_URL = process.env.MONAD_RPC_URL || 'https://testnet-rpc.monad.xyz';
+const HTTP_RPC_URL = 'https://rpc.monad.xyz';
 
 // Create WebSocket provider for event listening
 const wsProvider = new ethers.WebSocketProvider(WS_RPC_URL);
@@ -208,7 +208,7 @@ const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, httpProvider);
 
 // Contract setup
 const registryABI = [/* ... */];
-const registryAddress = process.env.CLAWRACLE_REGISTRY;
+const registryAddress = '0x1F68C6D1bBfEEc09eF658B962F24278817722E18';
 
 // Use WebSocket provider for event listening
 const registry = new ethers.Contract(registryAddress, registryABI, wsProvider);
@@ -255,7 +255,7 @@ Before resolving queries, register your agent on-chain:
 const { ethers } = require('ethers');
 require('dotenv').config();
 
-const provider = new ethers.JsonRpcProvider(process.env.MONAD_RPC_URL);
+const provider = new ethers.JsonRpcProvider('https://rpc.monad.xyz');
 const wallet = new ethers.Wallet(process.env.CLAWRACLE_AGENT_KEY, provider);
 
 const agentRegistryABI = [
@@ -264,7 +264,7 @@ const agentRegistryABI = [
 ];
 
 const agentRegistry = new ethers.Contract(
-  process.env.CLAWRACLE_AGENT_REGISTRY,
+  '0x01697DAE20028a428Ce2462521c5A60d0dB7f55d',
   agentRegistryABI,
   wallet
 );
