@@ -1,13 +1,16 @@
-# LLM-Driven API Integration Guide
+# Agent-Driven API Integration Guide
 
 ## Overview
 
-This skill uses **fully LLM-driven API integration** - no hardcoded API logic. Your LLM:
+This skill uses **fully agent-driven API integration** - no hardcoded API logic, no external LLM services. **YOU (the agent) should:**
 
-1. Reads `api-config.json` to find API for category
-2. Reads API documentation files from `api-docs/`
-3. Constructs API calls dynamically based on docs
-4. Extracts answers from responses
+1. Read `api-config.json` to find API for category
+2. Read API documentation files from `api-docs/`
+3. Construct API calls dynamically based on docs yourself
+4. Execute the HTTP requests directly
+5. Extract answers from responses yourself
+
+**CRITICAL**: Do NOT call external LLM APIs (like OpenAI). YOU are the LLM - read the config/docs and execute the calls yourself.
 
 **Default Capability**: This skill ships with sports oracle (TheSportsDB API pre-configured). For other categories, your owner must configure APIs and provide documentation.
 
@@ -65,25 +68,25 @@ if (!apiKey && sportsAPI.freeApiKey) {
 }
 ```
 
-#### Step 4: Use LLM to Construct API Call Dynamically
+#### Step 4: YOU Construct and Execute the API Call
 
-**CRITICAL**: Do NOT hardcode API call construction. Use your LLM to:
+**CRITICAL**: Do NOT hardcode API call construction. Do NOT call external LLM APIs. **YOU should:**
 
-1. Read and understand the API documentation
-2. Parse the natural language query
-3. Construct the API call based on the docs
-4. Execute the call
-5. Extract the answer from the response
+1. Read and understand the API documentation yourself
+2. Parse the natural language query yourself
+3. Construct the API call based on the docs yourself
+4. Execute the HTTP request directly (using axios, fetch, etc.)
+5. Extract the answer from the response yourself
 
-## LLM Prompt Template for API Call Construction
+## How YOU Should Construct API Calls
 
-Provide your LLM with:
+When constructing API calls, consider:
 - The user's query
 - The API documentation (from `api.docsFile`)
 - API configuration (baseUrl, apiKey, apiKeyLocation, etc.)
 - **Default Parameters** (if `api.defaultParams` exists) - ALWAYS include these in API calls
 
-Your LLM should return a JSON object with:
+Construct a JSON object with:
 ```json
 {
   "method": "GET" or "POST",
@@ -93,10 +96,9 @@ Your LLM should return a JSON object with:
 }
 ```
 
-### Example LLM Prompt
+### Example: How YOU Should Think About API Calls
 
-```
-You are an API integration assistant. Your job is to:
+When you receive a query, YOU should:
 1. Understand the user's query - extract CORE keywords (not every word)
 2. Read the API documentation provided
 3. Construct the appropriate API call(s) to answer the query
@@ -167,7 +169,7 @@ Return JSON with the API call details:
 - **Look for pagination params**: `pageSize`, `limit`, `per_page`, `maxResults`, `count`, etc.
 - **Use reasonable limits**: Default to 5-10 results unless query specifically needs more
 - **Check API defaults**: Some APIs default to 20-100 results which may be too many
-- **Purpose**: Keeps API responses small, reduces token usage, improves LLM processing speed
+- **Purpose**: Keeps API responses small, improves processing speed
 
 ### 4. Parameter Location (API Keys, Auth)
 
@@ -208,34 +210,34 @@ Return JSON with the API call details:
 - **Return first call in main response**: If multiple calls needed, return the first one in the main `url` field
 - **List steps**: Use `steps` array to document all API calls needed
 
-## LLM Prompt Template for Answer Extraction
+## How YOU Should Extract Answers
 
-After making the API call, use your LLM to extract a concise answer:
+After making the API call, YOU should extract a concise answer yourself:
 
-```
-You are an answer extraction assistant. Your job is to:
+**Guidelines:**
 1. Read the API response
 2. Understand the user's query
 3. Extract a SINGLE, CONCISE answer (1-2 sentences max)
 4. Prioritize recent/relevant data if multiple results
 5. If query asks about a specific date, only use data from that date
+6. Return ONLY the answer as a plain string (no JSON, no explanation, just the answer)
+7. If the answer cannot be found in the response, return "Could not find answer in API response"
 
-User Query: "{query}"
-API Response: {apiResponse}
+**Example:**
+- Query: "What was the score of Arsenal vs Chelsea?"
+- API Response: `{ "matches": [{ "homeTeam": "Arsenal", "awayTeam": "Chelsea", "score": "2-1" }] }`
+- YOU extract: "Arsenal 2-1 Chelsea"
 
-Return ONLY the answer as a plain string (no JSON, no explanation, just the answer).
-If the answer cannot be found in the response, return "Could not find answer in API response".
-```
-
-## Complete LLM-Driven Example
+## Complete Agent-Driven Example
 
 ```javascript
 const fs = require('fs');
 const axios = require('axios');
 require('dotenv').config();
 
-// Generic LLM-driven function - works for ANY API/category
-async function fetchDataForQuery(query, category, apiConfig, llmClient) {
+// Generic agent-driven function - works for ANY API/category
+// YOU (the agent) should implement this logic yourself
+async function fetchDataForQuery(query, category, apiConfig) {
   // 1. Find API for this category
   const api = apiConfig.apis.find(a => a.category.toLowerCase() === category.toLowerCase());
   if (!api) {
@@ -270,15 +272,17 @@ async function fetchDataForQuery(query, category, apiConfig, llmClient) {
     apiKey = api.freeApiKey;
   }
   
-  // 4. Use LLM to construct API call
-  const apiCallPlan = await llmClient.constructAPICall({
-    query,
-    apiDocs,
-    apiConfig: api,
-    apiKey
-  });
+  // 4. YOU construct the API call yourself
+  // Read the API docs, understand the query, build the URL/params
+  // Example: Based on query and API docs, construct:
+  const apiCallPlan = {
+    method: "GET",
+    url: `${api.baseUrl}/endpoint?param1=value1&param2=value2`,
+    headers: {},
+    body: null
+  };
   
-  // 5. Execute API call
+  // 5. Execute API call directly (YOU make the HTTP request)
   const response = await axios({
     method: apiCallPlan.method,
     url: apiCallPlan.url,
@@ -286,11 +290,10 @@ async function fetchDataForQuery(query, category, apiConfig, llmClient) {
     data: apiCallPlan.body || null
   });
   
-  // 6. Use LLM to extract answer
-  const answer = await llmClient.extractAnswer({
-    query,
-    apiResponse: response.data
-  });
+  // 6. YOU extract the answer yourself from the API response
+  // Parse the response and find the relevant answer
+  // Example: Extract the most relevant field from response.data based on the query
+  const answer = extractAnswerFromResponse(response.data, query);
   
   return {
     answer,
@@ -324,7 +327,7 @@ async function fetchDataForQuery(query, category, apiConfig, llmClient) {
    }
    ```
 3. **Add API key to `.env`**: `YOUR_API_KEY=your_key_here`
-4. **Test**: The LLM will automatically use the new API when queries match the category
+4. **Test**: YOU will automatically use the new API when queries match the category
 
 ## Default Parameters
 
@@ -341,4 +344,4 @@ These are specified in `api-config.json` as `defaultParams`:
 }
 ```
 
-**IMPORTANT**: When constructing API calls, ALWAYS include these default parameters. The LLM prompt should explicitly mention this.
+**IMPORTANT**: When constructing API calls, ALWAYS include these default parameters. Make sure YOU include them when building the API call.

@@ -1,0 +1,18 @@
+{
+  "trackedRequests": {
+    "1": {
+      "requestId": 1,
+      "category": "Sports",
+      "validFrom": 1770897593,
+      "deadline": 1770983813,
+      "reward": "500000000000000000000",
+      "bondRequired": "500000000000000000000",
+      "ipfsCID": "bafkreidmrgf4jf72stqzpimdfedx4nlj45hb2wmobkpscccxuuqfsit254",
+      "status": "FINALIZED",
+      "myAnswerId": 0,
+      "resolvedAt": 1770897620,
+      "finalizationTime": 1770897920,
+      "isDisputed": false
+    }
+  }
+}

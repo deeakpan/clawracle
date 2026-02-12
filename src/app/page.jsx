@@ -5,6 +5,21 @@ import { useAccount, useWalletClient, useReadContract, useWriteContract, useWait
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { Upload, CheckCircle, Clock, AlertCircle } from 'lucide-react'
 import { parseEther, formatEther } from 'viem'
+import Image from 'next/image'
+
+// Format balance to reasonable decimal places (removes long decimals)
+function formatBalance(value, decimals = 2) {
+  if (!value) return '0'
+  try {
+    const num = typeof value === 'bigint' ? Number(formatEther(value)) : Number(value)
+    if (isNaN(num) || !isFinite(num)) return '0'
+    // Round to specified decimals and remove trailing zeros
+    const formatted = num.toFixed(decimals)
+    return formatted.replace(/\.?0+$/, '')
+  } catch (e) {
+    return '0'
+  }
+}
 
 export default function Home() {
   const { address, isConnected } = useAccount()
@@ -296,7 +311,16 @@ export default function Home() {
         {/* Header */}
         <header className="mb-12 border-b border-gray-200 pb-6">
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-black tracking-tight">Clawracle</h1>
+            <div className="flex items-center gap-4">
+              <Image
+                src="/logo.png"
+                alt="Clawracle Logo"
+                width={48}
+                height={48}
+                className="rounded-full"
+              />
+              <h1 className="text-3xl font-bold text-black tracking-tight">Clawracle</h1>
+            </div>
             <ConnectButton />
           </div>
         </header>
@@ -312,7 +336,7 @@ export default function Home() {
               {balance !== undefined && (
                 <div className="text-right">
                   <p className="text-sm font-medium text-gray-600 mb-1">CLAWCLE Balance</p>
-                  <p className="text-2xl font-bold text-purple-600">{formatEther(balance || 0n)}</p>
+                  <p className="text-2xl font-bold text-purple-600">{formatBalance(balance)}</p>
                 </div>
               )}
             </div>
@@ -363,7 +387,7 @@ export default function Home() {
                   />
                   {balance !== undefined && (
                     <p className="text-xs text-gray-500 mt-1.5">
-                      Your balance: <span className="font-medium text-gray-700">{formatEther(balance || 0n)} CLAWCLE</span>
+                      Your balance: <span className="font-medium text-gray-700">{formatBalance(balance)} CLAWCLE</span>
                     </p>
                   )}
                   {reward && reward !== '' && (isNaN(parseFloat(reward)) || parseFloat(reward) < 500) && (
@@ -461,7 +485,7 @@ export default function Home() {
                       <p className="text-sm text-slate-600">{request.query?.category}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-slate-900">{request.query?.reward ? formatEther(request.query.reward) : '0'} CLAWCLE</p>
+                      <p className="text-sm font-medium text-slate-900">{request.query?.reward ? formatBalance(request.query.reward) : '0'} CLAWCLE</p>
                       <p className="text-xs text-slate-500">Reward</p>
                     </div>
                   </div>

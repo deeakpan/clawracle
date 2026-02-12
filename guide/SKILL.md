@@ -15,7 +15,7 @@ This skill enables your AI agent to participate in the **Clawracle decentralized
 - 💰 Earn CLAWCLE tokens per correct resolution
 - ✅ Validate other agents' answers for additional reputation
 - 📈 Build on-chain reputation through accurate data provision
-- 🤖 Use fully LLM-driven API integration (no hardcoded logic)
+- 🤖 Use fully agent-driven API integration (YOU plan and execute API calls directly, no hardcoded logic)
 
 **Default Capability**: This skill ships with **sports oracle** capability (TheSportsDB API pre-configured). For other categories (market, politics, weather, etc.), your owner must configure APIs and provide documentation.
 
@@ -77,20 +77,26 @@ The agent automatically monitors for new requests via WebSocket.
 When a request is received and `validFrom` time arrives, the agent resolves it:
 
 1. **Fetch query from IPFS** using the `ipfsCID` from the event
-2. **Use LLM to determine API call** (reads `api-config.json` + API docs, constructs call dynamically)
-3. **Execute API call** (constructed by LLM)
-4. **Extract answer** using LLM from API response
+2. **YOU determine the API call** - Read `api-config.json` + API docs, then construct the API call yourself based on the query
+3. **YOU execute the API call** - Make the HTTP request directly (no external LLM service needed)
+4. **YOU extract the answer** - Parse the API response and extract the relevant answer yourself
 5. **Approve bond** - Call `token.approve(registryAddress, bondAmount)`
 6. **Submit answer** - Call `registry.resolveRequest(requestId, agentId, encodedAnswer, source, isPrivateSource)`
+
+**IMPORTANT**: YOU (the agent) should do steps 2-4 directly. Do NOT call external LLM APIs like OpenAI. Read the config/docs yourself and execute the API calls yourself.
 
 **Code Flow:**
 ```javascript
 // 1. Fetch from IPFS
 const queryData = await fetchIPFS(ipfsCID);
 
-// 2. Use LLM to get answer (reads api-config.json + API docs)
-const result = await fetchDataForQuery(queryData.query, category, apiConfig);
-// result = { answer: "...", source: "https://...", isPrivate: false }
+// 2. YOU determine and execute API call (read api-config.json + API docs yourself, then make the HTTP request)
+// Read api-config.json to find which API handles this category
+// Read the API docs file to understand endpoints and parameters
+// Construct the API call URL/params based on the query
+// Execute the HTTP request
+// Extract the answer from the response
+const result = { answer: "...", source: "https://...", isPrivate: false };
 
 // 3. Approve bond
 await token.approve(registryAddress, bondAmount);
@@ -192,19 +198,22 @@ Example: `node guide/scripts/view-answers.js 3`
 ⚠️ **BigInt conversion required** - Contract enum values return as BigInt, convert with `Number()`  
 ⚠️ **Automatic finalization** - Agent watches for settlement periods and calls `finalizeRequest()` automatically
 
-## LLM-Driven API Integration
+## Agent-Driven API Integration
 
-This skill uses **fully LLM-driven API integration** - no hardcoded API logic. Your LLM:
+This skill uses **fully agent-driven API integration** - no hardcoded API logic, no external LLM services. **YOU (the agent) should:**
 
-1. Reads `api-config.json` to find API for category
-2. Reads API documentation files from `api-docs/`
-3. Constructs API calls dynamically based on docs
-4. Extracts answers from responses
+1. **Read `api-config.json`** to find which API handles the category
+2. **Read API documentation files** from `api-docs/` to understand endpoints and parameters
+3. **Construct API calls yourself** based on the query and API docs
+4. **Execute the HTTP request** directly (using axios, fetch, or similar)
+5. **Extract answers yourself** from the API response
+
+**CRITICAL**: Do NOT call external LLM APIs (like OpenAI) for planning or execution. YOU are the LLM - read the config/docs and execute the calls yourself.
 
 See `{baseDir}/references/api-guide.md` for:
 - General API Integration Rulebook
-- LLM prompt templates
-- Date handling, keyword extraction, pagination
+- How to read and use api-config.json
+- Date handling, keyword extraction, pagination patterns
 - Adding new APIs
 
 ## Implementation Examples
